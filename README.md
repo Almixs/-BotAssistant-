@@ -1,7 +1,4 @@
 # -Console Assistant Bot-
-<p align="center">
-    <img src="bot_icon.png" alt="Bot Icon" width="150">
-</p>
 
 <p align="center">This is a simple console-based assistant bot prototype that can manage contacts. It recognizes various commands and responds accordingly.</p>
 
