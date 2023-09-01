@@ -4,10 +4,19 @@ from collections import UserDict
 
 class Field:
     def __init__(self, value=None):
-        self.value = value
+        self._value = value
 
     def validate(self):
         pass
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, new_value):
+        self._value = new_value
+        self.validate()
 
 class Name(Field):
     def validate(self):
@@ -21,6 +30,19 @@ class Phone(Field):
         if self.value:
             if not re.match(r'^\+\d+$', self.value):
                 raise ValueError("Invalid phone number format. It should start with '+' and contain digits.")
+
+    @property
+    def value(self):
+        return ', '.join(self._value) if self._value else None
+
+    @value.setter
+    def value(self, new_value):
+        if new_value:
+            new_value = new_value.split(', ')
+            for number in new_value:
+                if not re.match(r'^\+\d+$', number):
+                    raise ValueError("Invalid phone number format. It should start with '+' and contain digits.")
+        self._value = new_value
 
 class Birthday(Field):
     DATE_FORMAT = "%Y-%m-%d"
@@ -53,16 +75,18 @@ class Record:
 
     def add_phone(self, phone_number):
         if "phone" not in self.fields:
-            self.fields["phone"] = Phone([phone_number])
+            self.fields["phone"] = Phone(phone_number)
         else:
             if self.fields["phone"].value is None:
-                self.fields["phone"].value = [phone_number]
+                self.fields["phone"].value = phone_number
             else:
-                if phone_number not in self.fields["phone"].value:
-                    self.fields["phone"].value.append(phone_number)
+                current_value = self.fields["phone"].value
+                if phone_number not in current_value.split(', '):
+                    current_value += ', ' + phone_number
+                    self.fields["phone"].value = current_value
                 else:
                     raise ValueError("Phone number already exists for this record.")
-                
+
     def show_birthday(self):
         if "birthday" in self.fields:
             return self.fields["birthday"].value
@@ -129,7 +153,7 @@ def main():
                         phones.append(part)
                     elif str(part).startswith("b"):
                         birthday = part[1:]
-        
+
                 if name not in address_book:
                     record = Record(name)
 
