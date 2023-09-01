@@ -17,10 +17,11 @@
 3. Available commands:
 
    - `hello`: Greet the bot.
-   - `add [name] [phone]`: Add a new contact with the specified name and phone number.
+   - `add [name] [phone] [birthday]`: Add a new contact with the specified name and phone number.
    - `change [name] [phone]`: Change the phone number of an existing contact.
    - `phone [name]`: Retrieve the phone number of a contact.
    - `show all`: Display all saved contacts.
+   - `days to birthday` -> `[name]`: The number of days until the next birthday.
    - `good bye`, `close`, `exit`: End the interaction with the bot.
 
 ## 🛠️ Implementation Details
