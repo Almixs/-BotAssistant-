@@ -22,6 +22,7 @@
    - `phone [name]`: Retrieve the phone number of a contact.
    - `show all`: Display all saved contacts.
    - `days to birthday` -> `[name]`: The number of days until the next birthday.
+   - `find` -> `[name]` or `[phone]`: Find contact.
    - `good bye`, `close`, `exit`: End the interaction with the bot.
 
 ## 🛠️ Implementation Details
