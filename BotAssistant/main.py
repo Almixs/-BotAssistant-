@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 from collections import UserDict
+import pickle
+import os
 
 class Field:
     def __init__(self, value=None):
@@ -105,17 +107,19 @@ class AddressBook(UserDict):
         if name in self.data:
             del self.data[name]
 
-    def find_records(self, **kwargs):
+    def find_records(self, query):
         results = []
         for record in self.data.values():
-            match = True
-            for key, value in kwargs.items():
-                if key in record.fields and record.fields[key].value != value:
-                    match = False
-                    break
+            match = False
+            if query in record.name.value.lower():
+                match = True
+            phone = record.fields.get("phone")
+            if phone and query in phone.value.lower():
+                match = True
             if match:
                 results.append(record)
         return results
+
 
     def __iter__(self):
         self.page = 0
@@ -131,9 +135,23 @@ class AddressBook(UserDict):
 
         self.page += 1
         return page_records
+    
+def save_data_on_exit(address_book, filename):
+    with open(filename, 'wb') as file:
+        pickle.dump(address_book, file)    
+
+def load_data_on_start(filename):
+    if os.path.exists(filename):
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+    else:
+        return AddressBook()
+    
 
 def main():
-    address_book = AddressBook()
+    data_filename = 'address_book_data.pkl'
+
+    address_book = load_data_on_start(data_filename)
 
     while True:
         command = input("Enter a command: ").strip().lower()
@@ -229,8 +247,26 @@ def main():
                     print(f"No birthday date found for {name}.")
             else:
                 print(f"Contact {name} not found.")
+        
+        elif command.startswith("find"):
+            search_query = input("Enter search query: ").strip().lower()
+            matching_records = address_book.find_records(query=search_query)
+            if matching_records:
+                print("Matching contacts:")
+                for record in matching_records:
+                    print(f"Name: {record.name.value}")
+                    phone = record.fields.get("phone")
+                    if phone:
+                        print(f"Phone: {phone.value}")
+                    birthday = record.fields.get("birthday")
+                    if birthday:
+                        print(f"Birthday: {birthday.value}")
+                    print("-" * 30)
+            else:
+                print("No matching contacts found.")
 
         elif command in ["good bye", "close", "exit"]:
+            save_data_on_exit(address_book, data_filename)
             print("Good bye!")
             break
         else:
